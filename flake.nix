@@ -5,12 +5,19 @@
     nixpkgs = {
       url = github:NixOS/nixpkgs/nixos-22.05;
     };
+    flake-utils-plus = {
+      url = github:gytis-ivaskevicius/flake-utils-plus/v1.3.1;
+    };
   };
 
-  outputs = { self, nixpkgs }: rec {
+  outputs = { self, nixpkgs, flake-utils-plus }@attrs: rec {
     nixosConfigurations.btpi = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       modules = [
+        ({ config, lib, ... }: flake-utils-plus.nixosModules.autoGenFromInputs { inputs = attrs; inherit config; inherit lib; })
+        {
+          nix.generateNixPathFromInputs = true;
+        }
         ({ pkgs, lib, ... }: {
           
           # Host
